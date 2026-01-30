@@ -1,0 +1,8 @@
+camera:
+  exposure_type: auto
+  f_number: 16.0
+  focal_length: 1.8
+  pixel_format: Mono16
+  target_brightness: 10
+convert:
+  gamma: 2.2
