@@ -8,6 +8,8 @@ __license__ = "GPLv3+"
 __version__ = "v1.0"
 __maintainer__ = "Evripidis Gkanias"
 
+import demosaic.utils as utils
+
 import numpy as np
 import PIL.Image as Image
 import piexif
@@ -91,10 +93,10 @@ def load_image(path, normalise=True):
         # check image mode
         if img.mode == 'I;16':
             dtype = np.float64
-            max_val = 65535.0
+            max_val = utils.LDR_MAX
         else:  # img.mode == 'L':
             dtype = np.float32
-            max_val = 255.0
+            max_val = utils.UINT8_MAX
 
         img = np.array(img, dtype=dtype) / max_val
 

@@ -26,8 +26,8 @@ def merge(*img, exposures=None, method=None, gamma_correction=None, ldr=True):
 
     Parameters
     ----------
-    img: list[np.ndarray[float, int]]
-        the images to be merged.
+    img: list[np.ndarray[float]]
+        the images to be merged. Values in range [0, 1].
     exposures: list[float] | None
         the exposures times. The number of exposures should equal the number of images in img. By default, exposures
         are assumed to be missing.
@@ -50,15 +50,22 @@ def merge(*img, exposures=None, method=None, gamma_correction=None, ldr=True):
         raise ValueError('Method must be one of {}'.format(METHODS))
 
     if exposures is not None:
-        exposures = exposures.copy()
+        exposures = np.array(exposures, dtype=np.float32).copy()
     if gamma_correction is None:
         tonemap = TONEMAP
     else:
         tonemap = cv2.createTonemap(gamma=gamma_correction)
-    hdr = method.process([np.uint8(i * 255) for i in img], times=exposures)
+    imgs = [np.uint8(i * 255) for i in img]
+    if method == METHODS["debevec"]:
+        # Estimate camera response function (CRF) - required for Debevec
+        calibrate = cv2.createCalibrateDebevec()
+        response = calibrate.process(imgs, times=exposures)
+        hdr = method.process(imgs, exposures, response)
+    else:
+        hdr = method.process(imgs, exposures)
 
     # LDR and gamma correction
-    hdr = tonemap.process(hdr)
+    # hdr = tonemap.process(hdr)
     if ldr:
         return ldr16(hdr)
     else:
@@ -78,7 +85,7 @@ def ldr16(img):
     -------
     np.ndarray[int]
     """
-    return np.clip(np.nan_to_num(img, nan=0) * du.LDR_MAX, 0, du.LDR_MAX).astype(np.uint16)
+    return np.clip(np.nan_to_num(img, nan=0) * du.LDR_MAX, 0, du.UINT16_MAX).astype(np.uint16)
 
 
 METHODS = {
