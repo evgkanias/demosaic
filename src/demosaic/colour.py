@@ -1,52 +1,62 @@
+"""
+Colour directory.
+"""
+__author__ = "Evripidis Gkanias"
+__copyright__ = "Copyright (c) 2026, Lund Vision Group, Lund University"
+__credits__ = ["Evripidis Gkanias"]
+__license__ = "GPLv3+"
+__version__ = "v1.0"
+__maintainer__ = "Evripidis Gkanias"
+
 import cv2
 
-BG2BGR = cv2.COLOR_BAYER_BG2BGR
-BG2BGRA = cv2.COLOR_BAYER_BG2BGRA
-BG2RGB = cv2.COLOR_BAYER_BG2RGB
-BG2RGBA = cv2.COLOR_BAYER_BG2RGBA
-BG2GRAY = cv2.COLOR_BAYER_BG2GRAY
+BG2BGR = 46  # cv2.COLOR_BAYER_BG2BGR
+BG2BGRA = 139  # cv2.COLOR_BAYER_BG2BGRA
+BG2RGB = 48  # cv2.COLOR_BAYER_BG2RGB
+BG2RGBA = 141  # cv2.COLOR_BAYER_BG2RGBA
+BG2GRAY = 86  # cv2.COLOR_BAYER_BG2GRAY
 
-BGGR2BGR = cv2.COLOR_BAYER_BGGR2BGR
-BGGR2BGRA = cv2.COLOR_BAYER_BGGR2BGRA
-BGGR2RGB = cv2.COLOR_BAYER_BGGR2RGB
-BGGR2RGBA = cv2.COLOR_BAYER_BGGR2RGBA
-BGGR2GRAY = cv2.COLOR_BAYER_BGGR2GRAY
+BGGR2BGR = 48  # cv2.COLOR_BAYER_BGGR2BGR
+BGGR2BGRA = 141  # cv2.COLOR_BAYER_BGGR2BGRA
+BGGR2RGB = 46  # cv2.COLOR_BAYER_BGGR2RGB
+BGGR2RGBA = 139  # cv2.COLOR_BAYER_BGGR2RGBA
+BGGR2GRAY = 88  # cv2.COLOR_BAYER_BGGR2GRAY
 
-RG2BGR = cv2.COLOR_BAYER_RG2BGR
-RG2BGRA = cv2.COLOR_BAYER_RG2BGRA
-RG2RGB = cv2.COLOR_BAYER_RG2RGB
-RG2RGBA = cv2.COLOR_BAYER_RG2RGBA
-RG2GRAY = cv2.COLOR_BAYER_RG2GRAY
+RG2BGR = 48  # cv2.COLOR_BAYER_RG2BGR
+RG2BGRA = 141  # cv2.COLOR_BAYER_RG2BGRA
+RG2RGB = 46  # cv2.COLOR_BAYER_RG2RGB
+RG2RGBA = 139  # cv2.COLOR_BAYER_RG2RGBA
+RG2GRAY = 88  # cv2.COLOR_BAYER_RG2GRAY
 
-RGGB2BGR = cv2.COLOR_BAYER_RGGB2BGR
-RGGB2BGRA = cv2.COLOR_BAYER_BGGR2BGRA
-RGGB2RGB = cv2.COLOR_BAYER_RGGB2RGB
-RGGB2RGBA = cv2.COLOR_BAYER_RGGB2RGBA
-RGGB2GRAY = cv2.COLOR_BAYER_RGGB2GRAY
+RGGB2BGR = 46  # cv2.COLOR_BAYER_RGGB2BGR
+RGGB2BGRA = 141  # cv2.COLOR_BAYER_BGGR2BGRA
+RGGB2RGB = 48  # cv2.COLOR_BAYER_RGGB2RGB
+RGGB2RGBA = 141  # cv2.COLOR_BAYER_RGGB2RGBA
+RGGB2GRAY = 86  # cv2.COLOR_BAYER_RGGB2GRAY
 
-GB2BGR = cv2.COLOR_BAYER_GB2BGR
-GB2BGRA = cv2.COLOR_BAYER_GB2BGRA
-GB2RGB = cv2.COLOR_BAYER_GB2RGB
-GB2RGBA = cv2.COLOR_BAYER_GB2RGBA
-GB2GRAY = cv2.COLOR_BAYER_GB2GRAY
+GB2BGR = 47  # cv2.COLOR_BAYER_GB2BGR
+GB2BGRA = 140  # cv2.COLOR_BAYER_GB2BGRA
+GB2RGB = 49  # cv2.COLOR_BAYER_GB2RGB
+GB2RGBA = 142  # cv2.COLOR_BAYER_GB2RGBA
+GB2GRAY = 87  # cv2.COLOR_BAYER_GB2GRAY
 
-GBRG2BGR = cv2.COLOR_BAYER_GBRG2BGR
-GBRG2BGRA = cv2.COLOR_BAYER_GBRG2BGRA
-GBRG2RGB = cv2.COLOR_BAYER_GBRG2RGB
-GBRG2RGBA = cv2.COLOR_BAYER_GBRG2RGBA
-GBRG2GRAY = cv2.COLOR_BAYER_GBRG2GRAY
+GBRG2BGR = 49  # cv2.COLOR_BAYER_GBRG2BGR
+GBRG2BGRA = 142  # cv2.COLOR_BAYER_GBRG2BGRA
+GBRG2RGB = 47  # cv2.COLOR_BAYER_GBRG2RGB
+GBRG2RGBA = 140  # cv2.COLOR_BAYER_GBRG2RGBA
+GBRG2GRAY = 89  # cv2.COLOR_BAYER_GBRG2GRAY
 
-GR2BGR = cv2.COLOR_BAYER_GR2BGR
-GR2BGRA = cv2.COLOR_BAYER_GR2BGRA
-GR2RGB = cv2.COLOR_BAYER_GR2RGB
-GR2RGBA = cv2.COLOR_BAYER_GR2RGBA
-GR2GRAY = cv2.COLOR_BAYER_GR2GRAY
+GR2BGR = 49  # cv2.COLOR_BAYER_GR2BGR
+GR2BGRA = 142  # cv2.COLOR_BAYER_GR2BGRA
+GR2RGB = 47  # cv2.COLOR_BAYER_GR2RGB
+GR2RGBA = 140  # cv2.COLOR_BAYER_GR2RGBA
+GR2GRAY = 89  # cv2.COLOR_BAYER_GR2GRAY
 
-GRBG2BGR = cv2.COLOR_BAYER_GRBG2BGR
-GRBG2BGRA = cv2.COLOR_BAYER_GBRG2BGRA
-GRBG2RGB = cv2.COLOR_BAYER_GRBG2RGB
-GRBG2RGBA = cv2.COLOR_BAYER_GRBG2RGBA
-GRBG2GRAY = cv2.COLOR_BAYER_GRBG2GRAY
+GRBG2BGR = 47  # cv2.COLOR_BAYER_GRBG2BGR
+GRBG2BGRA = 142  # cv2.COLOR_BAYER_GBRG2BGRA
+GRBG2RGB = 49  # cv2.COLOR_BAYER_GRBG2RGB
+GRBG2RGBA = 142  # cv2.COLOR_BAYER_GRBG2RGBA
+GRBG2GRAY = 87  # cv2.COLOR_BAYER_GRBG2GRAY
 
 MONO_000_135_045_090 = 200
 MONO_000_045_135_090 = 201
@@ -493,54 +503,210 @@ GROUP_135_090_000_045 = {
 
 
 def from_bggr(colour):
+    """
+    Checks whether the colour code indicates transformation from the BGGR Bayer pattern.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return colour in GROUP_BGGR
 
 
 def from_rggb(colour):
+    """
+    Checks whether the colour code indicates transformation from the RGGB Bayer pattern.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return colour in GROUP_RGGB
 
 
 def from_grbg(colour):
+    """
+    Checks whether the colour code indicates transformation from the GRBG Bayer pattern.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return colour in GROUP_GRBG
 
 
 def from_gbrg(colour):
+    """
+    Checks whether the colour code indicates transformation from the GBRG Bayer pattern.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return colour in GROUP_GBRG
 
 
 def from_000_045_135_090(colour):
+    """
+    Checks whether the colour code indicates transformation from the 0, 45, 135, 90 deg polarisation pattern.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return colour in GROUP_000_045_135_090
 
 
 def from_000_135_045_090(colour):
+    """
+    Checks whether the colour code indicates transformation from the 0, 135, 45, 90 deg polarisation pattern.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return colour in GROUP_000_135_045_090
 
 
 def from_045_000_090_135(colour):
+    """
+    Checks whether the colour code indicates transformation from the 45, 0, 90, 135 deg polarisation pattern.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return colour in GROUP_045_000_090_135
 
 
 def from_045_090_000_135(colour):
+    """
+    Checks whether the colour code indicates transformation from the 45, 90, 0, 135 deg polarisation pattern.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return colour in GROUP_045_090_000_135
 
 
 def from_090_045_135_000(colour):
+    """
+    Checks whether the colour code indicates transformation from the 90, 45, 135, 0 deg polarisation pattern.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return colour in GROUP_090_045_135_000
 
 
 def from_090_135_045_000(colour):
+    """
+    Checks whether the colour code indicates transformation from the 90, 135, 45, 0 deg polarisation pattern.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return colour in GROUP_090_135_045_000
 
 
 def from_135_000_090_045(colour):
+    """
+    Checks whether the colour code indicates transformation from the 135, 0, 90, 45 deg polarisation pattern.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return colour in GROUP_135_000_090_045
 
 
 def from_135_090_000_045(colour):
+    """
+    Checks whether the colour code indicates transformation from the 135, 90, 0, 45 deg polarisation pattern.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return colour in GROUP_135_090_000_045
 
 
 def from_polarised(colour):
+    """
+    Checks whether the colour code indicates transformation from any polarisation pattern.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return (
         from_000_045_135_090(colour) or
         from_000_135_045_090(colour) or
@@ -554,16 +720,66 @@ def from_polarised(colour):
 
 
 def to_rgb(colour):
+    """
+    Checks whether the colour code indicates transformation to an RGB image.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return colour in GROUP_RGB
 
 
 def to_bgr(colour):
+    """
+    Checks whether the colour code indicates transformation to an BGR image.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return colour in GROUP_BGR
 
 
 def to_gray(colour):
+    """
+    Checks whether the colour code indicates transformation to a gray scale image.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
     return colour in GROUP_GRAY
 
 
 def blur(img, blur_kernel):
+    """
+    Blurs the image using a Gaussian blur kernel.
+
+    Parameters
+    ----------
+    img: numpy.ndarray[float, int]
+        the image to be blurred.
+    blur_kernel: int
+        the size of the Gaussian blur kernel in pixels.
+
+    Returns
+    -------
+    numpy.ndarray[float, int]
+    """
     return cv2.blur(img, (blur_kernel,) * 2)

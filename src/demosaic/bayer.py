@@ -1,3 +1,13 @@
+"""
+The Bayer demosaicing functionality.
+"""
+__author__ = "Evripidis Gkanias"
+__copyright__ = "Copyright (c) 2026, Lund Vision Group, Lund University"
+__credits__ = ["Evripidis Gkanias"]
+__license__ = "GPLv3+"
+__version__ = "v1.0"
+__maintainer__ = "Evripidis Gkanias"
+
 import demosaic.colour as dc
 
 import scipy.signal as ss
@@ -6,6 +16,30 @@ import cv2
 
 
 def demosaic(img, method=None, colour=dc.RG2RGB, blur_kernel=3):
+    """
+    Transforms a mosaic image with Bayer filters on it into a coloured image as described by the colour value. The
+    colour indicates both the Bayer pattern and the result colour encoding. The supported demosaicing methods are:
+    'none', 'bilinear', 'malvar' (default), 'fourier', 'cv' (running the innate Open CV method), 'none_pol',
+    'bilinear_pol', 'malvar_pol', and 'fourier_pol'. The variants with 'pol' assume that the polarisation filters have
+    not been demosaiced beforehand. Custom methods are also supported, and the minimum input should be the mosaic image
+    and colour code.
+
+    Parameters
+    ----------
+    img: np.ndarray[int, float]
+        the 2D array of a mosaic image.
+    method: callable, str
+        the method to use; this could be the name of the method (e.g., 'none', 'bilinear', 'malvar', 'fourier', 'cv')
+        or a custom function.
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+    blur_kernel: int
+        the kernel size of the blur kernel.
+
+    Returns
+    -------
+    np.ndarray[int, float] | None
+    """
     if method is None:
         method = malvar
     elif isinstance(method, str):
@@ -20,6 +54,25 @@ def demosaic(img, method=None, colour=dc.RG2RGB, blur_kernel=3):
 
 
 def none(img, colour=dc.RG2RGB, include_polarisation=False):
+    """
+    This method is doing the minimum interpolation by copying the colour values of neighbouring pixels to infer
+    the missing colours in each pixel.
+
+    Parameters
+    ----------
+    img: np.ndarray[int, float]
+        the 2D array of a mosaic image.
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+    include_polarisation: bool
+        whether to take into account that polarisation filters are also included. This makes each colout filter to
+        occupy 2x2 pixels instead of a single pixel and is handled differently. If the polarisation was demosaiced
+        beforehand, this should be False.
+
+    Returns
+    -------
+    np.ndarray[int, float] | None
+    """
     red, green_0, green_1, blue = split_channels(img, colour, include_polarisation)
 
     g0 = (0.5 * green_0 + 0.5 * green_1).astype(np.uint16)
@@ -53,6 +106,24 @@ def none(img, colour=dc.RG2RGB, include_polarisation=False):
 
 
 def bilinear(img, colour=dc.RG2RGB, include_polarisation=False):
+    """
+    This method is taking the average value of neighbouring pixels to infer  the missing colours in each pixel.
+
+    Parameters
+    ----------
+    img: np.ndarray[int, float]
+        the 2D array of a mosaic image.
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+    include_polarisation: bool
+        whether to take into account that polarisation filters are also included. This makes each colout filter to
+        occupy 2x2 pixels instead of a single pixel and is handled differently. If the polarisation was demosaiced
+        beforehand, this should be False.
+
+    Returns
+    -------
+    np.ndarray[int, float] | None
+    """
     red, green_0, green_1, blue = split_channels(img, colour, include_polarisation)
 
     # read the first 4x4 block
@@ -105,6 +176,30 @@ def bilinear(img, colour=dc.RG2RGB, include_polarisation=False):
 
 
 def malvar(img, colour=dc.RG2RGB, include_polarisation=False):
+    """
+    This method is using a weighted average of neighbouring pixels and its own value to infer the missing colours in
+    each pixel. It uses information from all the colours to calculate these values.
+
+    Notes
+    -----
+    Malvar, H. S., He, L.-W. & Cutler, R. High-Quality Linear Interpolation for Demosaicing of Bayer-Patterned Color
+    Images. 2004 IEEE Int. Conf. Acoust., Speech, Signal Process. 3, III-485-III–488 (2004).
+
+    Parameters
+    ----------
+    img: np.ndarray[int, float]
+        the 2D array of a mosaic image.
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+    include_polarisation: bool
+        whether to take into account that polarisation filters are also included. This makes each colout filter to
+        occupy 2x2 pixels instead of a single pixel and is handled differently. If the polarisation was demosaiced
+        beforehand, this should be False.
+
+    Returns
+    -------
+    np.ndarray[int, float] | None
+    """
     red, green_0, green_1, blue = split_channels(np.astype(img, np.float64), colour, include_polarisation)
 
     # img = np.astype(img, np.float64)
@@ -185,15 +280,39 @@ def malvar(img, colour=dc.RG2RGB, include_polarisation=False):
 
     rgb = np.empty((rgb00.shape[0] + rgb01.shape[0], rgb10.shape[1] + rgb11.shape[1], rgb00.shape[2]),
                    dtype=img.dtype)
-    rgb[0::2, 0::2] = rgb00
-    rgb[1::2, 0::2] = rgb01
-    rgb[0::2, 1::2] = rgb10
-    rgb[1::2, 1::2] = rgb11
+    rgb[0::2, 0::2] = np.round(rgb00)
+    rgb[1::2, 0::2] = np.round(rgb01)
+    rgb[0::2, 1::2] = np.round(rgb10)
+    rgb[1::2, 1::2] = np.round(rgb11)
 
     return to_colour(rgb[..., 0], rgb[..., 1], rgb[..., 2], colour=colour)
 
 
 def fourier(img, colour=dc.RG2RGB, include_polarisation=False):
+    """
+    This method is doing a Fourier transform of the image to analyse the colours. This implementation is not complete
+    for all the colour patterns.
+
+    Notes
+    -----
+    Hagen, N., Stockmans, T., Otani, Y. & Buranasiri, P. Fourier-domain filtering analysis for color-polarization camera
+    demosaicking. Appl. Opt. 63, 2314 (2024).
+
+    Parameters
+    ----------
+    img: np.ndarray[int, float]
+        the 2D array of a mosaic image.
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+    include_polarisation: bool
+        whether to take into account that polarisation filters are also included. This makes each colout filter to
+        occupy 2x2 pixels instead of a single pixel and is handled differently. If the polarisation was demosaiced
+        beforehand, this should be False.
+
+    Returns
+    -------
+    NotImplementedError
+    """
     n_x, n_y = img.shape[:2]
 
     x = np.arange(n_x)[:, None]
@@ -228,7 +347,7 @@ def fourier(img, colour=dc.RG2RGB, include_polarisation=False):
     # plt.ylabel('y-axis frequencies (Nyquist units)')
     # plt.show()
 
-    mask = create_mask_function(n_x, n_y, n_x // 4, n_y // 4)
+    mask = __create_mask_function(n_x, n_y, n_x // 4, n_y // 4)
 
     c00 = np.fft.ifft2(np.fft.ifftshift(f2 * mask))
     c10 = np.fft.ifft2(np.fft.ifftshift(np.roll(f2, -m_x, axis=0) * mask))
@@ -294,8 +413,10 @@ def fourier(img, colour=dc.RG2RGB, include_polarisation=False):
     rgb_ns2[:, :, 1] = gns2
     rgb_ns2[:, :, 2] = bns2
 
+    raise NotImplementedError("The Fourier method is not yet implemented.")
 
-def create_mask_function(n_x, n_y, m_x, m_y, mask_type='rect'):
+
+def __create_mask_function(n_x, n_y, m_x, m_y, mask_type='rect'):
     p_x, p_y = n_x // 2, n_y // 2
     mask = np.zeros((n_x, n_y), dtype=float)
 
@@ -315,12 +436,31 @@ def create_mask_function(n_x, n_y, m_x, m_y, mask_type='rect'):
     return mask
 
 
-def get_red_mask(img, colour=dc.RG2RGB, include_polarisation=True):
-    x = np.arange(img.shape[0])[:, None]
-    y = np.arange(img.shape[1])[None, :]
+def get_red_mask(shape, colour=dc.RG2RGB, include_polarisation=True):
+    """
+    Calculates the mask that includes only the red filters in the mosaic based on the Bayer colour pattern and on
+    whether polarisation was already demosaiced.
 
-    mu_x = get_mu_x(x, colour, include_polarisation)
-    mu_y = get_mu_x(y, colour, include_polarisation)
+    Parameters
+    ----------
+    shape: list[int] | tuple[int]
+        the image shape.
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+    include_polarisation: bool
+        whether to take into account that polarisation filters are also included. This makes each colout filter to
+        occupy 2x2 pixels instead of a single pixel and is handled differently. If the polarisation was demosaiced
+        beforehand, this should be False.
+
+    Returns
+    -------
+    np.ndarray[bool]
+    """
+    x = np.arange(shape[0])[:, None]
+    y = np.arange(shape[1])[None, :]
+
+    mu_x = __get_mu_x(x, colour, include_polarisation)
+    mu_y = __get_mu_x(y, colour, include_polarisation)
 
     if dc.from_rggb(colour):
         mu = .25 * (1 + mu_x) * (1 + mu_y)
@@ -331,15 +471,34 @@ def get_red_mask(img, colour=dc.RG2RGB, include_polarisation=True):
     else:
         mu = .25 * (1 + mu_x) * (1 - mu_y)
 
-    return np.round(mu)
+    return mu > 0.5
 
 
-def get_blue_mask(img, colour=dc.RG2RGB, include_polarisation=True):
-    x = np.arange(img.shape[0])[:, None]
-    y = np.arange(img.shape[1])[None, :]
+def get_blue_mask(shape, colour=dc.RG2RGB, include_polarisation=True):
+    """
+    Calculates the mask that includes only the blue filters in the mosaic based on the Bayer colour pattern and on
+    whether polarisation was already demosaiced.
 
-    mu_x = get_mu_x(x, colour, include_polarisation)
-    mu_y = get_mu_x(y, colour, include_polarisation)
+    Parameters
+    ----------
+    shape: list[int] | tuple[int]
+        the image shape.
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+    include_polarisation: bool
+        whether to take into account that polarisation filters are also included. This makes each colout filter to
+        occupy 2x2 pixels instead of a single pixel and is handled differently. If the polarisation was demosaiced
+        beforehand, this should be False.
+
+    Returns
+    -------
+    np.ndarray[bool]
+    """
+    x = np.arange(shape[0])[:, None]
+    y = np.arange(shape[1])[None, :]
+
+    mu_x = __get_mu_x(x, colour, include_polarisation)
+    mu_y = __get_mu_x(y, colour, include_polarisation)
 
     if dc.from_rggb(colour):
         mu = .25 * (1 - mu_x) * (1 - mu_y)
@@ -353,12 +512,31 @@ def get_blue_mask(img, colour=dc.RG2RGB, include_polarisation=True):
     return np.round(mu)
 
 
-def get_green_mask(img, colour=dc.RG2RGB, include_polarisation=True):
-    x = np.arange(img.shape[0])[:, None]
-    y = np.arange(img.shape[1])[None, :]
+def get_green_mask(shape, colour=dc.RG2RGB, include_polarisation=True):
+    """
+    Calculates the mask that includes only the green filters in the mosaic based on the Bayer colour pattern and on
+    whether polarisation was already demosaiced.
 
-    mu_x = get_mu_x(x, colour, include_polarisation)
-    mu_y = get_mu_x(y, colour, include_polarisation)
+    Parameters
+    ----------
+    shape: list[int] | tuple[int]
+        the image shape.
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+    include_polarisation: bool
+        whether to take into account that polarisation filters are also included. This makes each colout filter to
+        occupy 2x2 pixels instead of a single pixel and is handled differently. If the polarisation was demosaiced
+        beforehand, this should be False.
+
+    Returns
+    -------
+    np.ndarray[bool]
+    """
+    x = np.arange(shape[0])[:, None]
+    y = np.arange(shape[1])[None, :]
+
+    mu_x = __get_mu_x(x, colour, include_polarisation)
+    mu_y = __get_mu_x(y, colour, include_polarisation)
 
     if dc.from_rggb(colour) or dc.from_bggr(colour):
         mu = .5 * (1 - mu_x * mu_y)
@@ -368,10 +546,36 @@ def get_green_mask(img, colour=dc.RG2RGB, include_polarisation=True):
     return np.round(mu)
 
 
+def __get_mu_x(x, colour, include_polarisation=True):
+    if dc.from_polarised(colour) and include_polarisation:
+        return np.sqrt(2) * np.cos(np.pi / 4 * (2 * x - 1))
+    else:
+        return np.cos(np.pi * x)
+
+
 def split_channels(img, colour=dc.RG2RGB, include_polarisation=True):
-    red_mask = get_red_mask(img, colour=colour, include_polarisation=include_polarisation) > 0
-    green_mask = get_green_mask(img, colour=colour, include_polarisation=include_polarisation) > 0
-    blue_mask = get_blue_mask(img, colour=colour, include_polarisation=include_polarisation) > 0
+    """
+    Based on the colour code and polarisation information, it splits the image mosaic into the separate channels:
+    red, green_0, green_1, and blue.
+
+    Parameters
+    ----------
+    img: np.ndarray[int, float]
+        the 2D array of a mosaic image.
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+    include_polarisation: bool
+        whether to take into account that polarisation filters are also included. This makes each colout filter to
+        occupy 2x2 pixels instead of a single pixel and is handled differently. If the polarisation was demosaiced
+        beforehand, this should be False.
+
+    Returns
+    -------
+    tuple[np.ndarray[int, float], np.ndarray[int, float], np.ndarray[int, float], np.ndarray[int, float]]
+    """
+    red_mask = get_red_mask(img.shape, colour=colour, include_polarisation=include_polarisation)
+    green_mask = get_green_mask(img.shape, colour=colour, include_polarisation=include_polarisation)
+    blue_mask = get_blue_mask(img.shape, colour=colour, include_polarisation=include_polarisation)
 
     red = np.reshape(img[red_mask], (img.shape[0] // 2, -1))
     green = np.reshape(img[green_mask], (img.shape[0], -1))
@@ -383,6 +587,25 @@ def split_channels(img, colour=dc.RG2RGB, include_polarisation=True):
 
 
 def to_colour(red, green, blue, colour=dc.RG2RGB):
+    """
+    Combines the red, green and blue channels into a single colour image based on the colour code.
+
+    Parameters
+    ----------
+    red: np.ndarray[int, float]
+        the red channel.
+    green: np.ndarray[int, float]
+        the green channel.
+    blue: np.ndarray[int, float]
+        the blue channel.
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    np.ndarray[int, float]
+    """
+
     if dc.to_bgr(colour):
         img = np.transpose([blue, green, red], axes=(1, 2, 0))
     elif dc.to_rgb(colour):
@@ -393,21 +616,32 @@ def to_colour(red, green, blue, colour=dc.RG2RGB):
     return img
 
 
-def get_mu_x(x, colour, include_polarisation=True):
-    if dc.from_polarised(colour) and include_polarisation:
-        return np.sqrt(2) * np.cos(np.pi / 4 * (2 * x - 1))
-    else:
-        return np.cos(np.pi * x)
-
-
 def cv(img, colour=dc.RG2RGB):
+    """
+    Uses the OpenCV library to convert the Bayer-mosaic image into a colour image.
+
+    Parameters
+    ----------
+    img: np.ndarray[int, float]
+        the 2D array of a mosaic image.
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    np.ndarray[int, float] | None
+    """
     return cv2.cvtColor(img, colour)
 
 
 METHODS = {
     "none": none,
+    "none_pol": lambda *args, **kwargs: none(*args, **kwargs, include_polarisation=True),
     "bilinear": bilinear,
+    "bilinear_pol": lambda *args, **kwargs: bilinear(*args, **kwargs, include_polarisation=True),
     "malvar": malvar,
+    "malvar_pol": lambda *args, **kwargs: malvar(*args, **kwargs, include_polarisation=True),
     "fourier": fourier,
+    "fourier_pol": lambda *args, **kwargs: fourier(*args, **kwargs, include_polarisation=True),
     "cv": cv
 }

@@ -1,3 +1,13 @@
+"""
+Input and output functions.
+"""
+__author__ = "Evripidis Gkanias"
+__copyright__ = "Copyright (c) 2026, Lund Vision Group, Lund University"
+__credits__ = ["Evripidis Gkanias"]
+__license__ = "GPLv3+"
+__version__ = "v1.0"
+__maintainer__ = "Evripidis Gkanias"
+
 import numpy as np
 import PIL.Image as Image
 import piexif
@@ -6,17 +16,40 @@ import os
 import re
 import loguru as lg
 
-__ROOT_DIR__ = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-
-with open(os.path.join(__ROOT_DIR__, "config.yaml"), 'r') as f:
-    config = yaml.safe_load(f)
-
 
 def get_raw_image_files(directory):
+    """
+    Returns the raw image files from a directory based on their name patterns. Images what are named as 'image#.tiff'
+    or 'image_#.tiff' are supposed to be raw, where # is a number. It returns a list of names of the raw image files,
+    sorted in ascending order.
+
+    Parameters
+    ----------
+    directory: str
+        the path of the directory to search for image files.
+
+    Returns
+    -------
+    list[str]
+    """
     return sorted([f for f in os.listdir(directory) if re.match(r'image\d+\.tiff$', f)])
 
 
 def read_raw_images(directory):
+    """
+    Reads the raw image files from a directory based on their name patterns. Images what are named as 'image#.tiff' or
+    'image_#.tiff' are supposed to be raw, where # is a number. It returns a tuple of the image data, metadata, and
+    file names.
+
+    Parameters
+    ----------
+    directory: str
+        the path of the directory to search for image files.
+
+    Returns
+    -------
+    tuple[list[np.ndarray[int]], list[dict], list[str]]
+    """
     files = get_raw_image_files(directory)
     images = []
     metas = []
@@ -36,6 +69,20 @@ def read_raw_images(directory):
 
 
 def load_image(path, normalise=True):
+    """
+    Loads an image from a file. If normalise is set to True, the image is normalised to [0, 1].
+
+    Parameters
+    ----------
+    path: str
+        the path of the image to load.
+    normalise: bool
+        whether to normalise the image to [0, 1]. Default is True.
+
+    Returns
+    -------
+    np.ndarray[float, int]
+    """
     img = Image.open(path)
 
     if normalise:
@@ -55,10 +102,35 @@ def load_image(path, normalise=True):
 
 
 def load_meta(path):
+    """
+    Loads the EXIF metadata from an image file.
+
+    Parameters
+    ----------
+    path: str
+        the path of the image to load its metadata.
+
+    Returns
+    -------
+    dict[str, Any]
+    """
     return get_meta(piexif.load(path))
 
 
 def save_image(path, img, meta=None):
+    """
+    Saves an image and its metadata to a file. This function supports unit16 values only for single channel images. RGB
+    images are transformed into uint8.
+
+    Parameters
+    ----------
+    path: str
+        the path of the image to save.
+    img: np.ndarray[float, int]
+        the pixel values of the image.
+    meta: dict[str, Any]
+        the metadata of the image. Default is None.
+    """
     lg.logger.debug(f'Saving image...')
     # transform uint16 to uint8
     # Pillow does not support uint16 RGB images
@@ -87,6 +159,18 @@ def save_image(path, img, meta=None):
 
 
 def get_exif_bytes(meta):
+    """
+    Transforms the dictionary of metadata into an array of EXIF bytes to accompany an image file.
+
+    Parameters
+    ----------
+    meta: dict[str, Any]
+        the metadata of the image.
+
+    Returns
+    -------
+    bytes
+    """
     exif = {"0th": {}, "Exif": {}, "GPS": {}}
 
     # Camera info
@@ -132,6 +216,18 @@ def get_exif_bytes(meta):
 
 
 def get_meta(exif):
+    """
+    Transforms EXIF data into a metadata dictionary.
+
+    Parameters
+    ----------
+    exif: dict
+        the EXIF data.
+
+    Returns
+    -------
+    dict[str, Any]
+    """
     # Camera info
     meta = {
         "CameraMaker": exif["0th"][piexif.ImageIFD.Make],
@@ -168,6 +264,17 @@ def get_meta(exif):
 
 
 def save_metadata(dir_path, meta):
+    """
+    Saves the metadata in a file called 'info.txt' in the given directory. The format of the metadata matches the one of
+    a YAML file.
+
+    Parameters
+    ----------
+    dir_path: str
+        the directory to save the metadata in.
+    meta: dict[str, Any]
+        the metadata dictionary.
+    """
     path = os.path.join(dir_path, 'info.txt')
     with open(path, 'w') as f:
         yaml.safe_dump(meta, f)
@@ -175,6 +282,19 @@ def save_metadata(dir_path, meta):
 
 
 def dms(decimal):
+    """
+    Converts a decimal number that indicates an angle (degrees) of an Earth's coordinate to a tuple of
+    degrees, minutes, seconds and sign. T
+
+    Parameters
+    ----------
+    decimal: float
+        the decimal number of the angle in degrees.
+
+    Returns
+    -------
+    tuple[int, int, int, int]
+    """
     sign = np.sign(decimal)
     decimal_degrees = abs(decimal)
 
@@ -190,19 +310,59 @@ def dms(decimal):
 
 
 def undms(degrees, minutes, seconds, sign):
-    """Convert DMS (degrees, minutes, seconds, sign) back to decimal degrees."""
+    """
+    Convert DMS (degrees, minutes, seconds, sign) back to decimal degrees. The result angle (in degrees) is rounded to
+    4 decimal digits.
+
+    Parameters
+    ----------
+    degrees: int
+    minutes: int
+    seconds: int
+    sign: int
+
+    Returns
+    -------
+    float
+    """
     decimal = float(np.round(abs(degrees) + minutes / 60.0 + seconds / 3600.0, decimals=4))
     return sign * decimal
 
 
 def rational(value, precision=100000):
+    """
+    Converts a real number (value) into a rational tuple based on the precision. The precision sets how many digits of
+    the value to keep. The value is multiplied with its precision and all the remaining digits are discarded. The result
+    is two integers (rational tuple): the outcome of the multiplication (numerator) and the precision (denominator).
+
+    Parameters
+    ----------
+    value: float
+        the number to convert.
+    precision: int
+        the precision of the number.
+
+    Returns
+    -------
+    tuple[int, int]
+    """
     numerator = int(np.round(value * precision))
     denominator = precision
     return numerator, denominator
 
 
 def unrational(*rational_tuple):
-    """Convert a rational tuple (numerator, denominator) back to float."""
+    """
+    Convert a rational tuple (numerator, denominator) back to float.
+
+    Parameters
+    ----------
+    rational_tuple: tuple[int, int]
+
+    Returns
+    -------
+    float
+    """
     numerator, denominator = rational_tuple
     return float(numerator) / float(denominator)
 
