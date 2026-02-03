@@ -1,4 +1,4 @@
-name: demosaic
+name: demosaic-env
 channels:
   - conda-forge
 dependencies:
