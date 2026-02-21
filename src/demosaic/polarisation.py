@@ -99,8 +99,6 @@ def stokes(img, colour=dc.MONO_000_135_045_090):
     i1 = f["000"] + f["090"] + np.finfo(float).eps
     i2 = f["045"] + f["135"] + np.finfo(float).eps
 
-    print(i1.max(), i2.max())
-
     new_img = np.zeros((*img.shape[:-1], 3), dtype=float)
     new_img[..., 0] = (i1 + i2) / 4.0  # I or S0
 

@@ -573,15 +573,16 @@ def split_channels(img, colour=dc.RG2RGB, include_polarisation=True):
     -------
     tuple[np.ndarray[int, float], np.ndarray[int, float], np.ndarray[int, float], np.ndarray[int, float]]
     """
-    red_mask = get_red_mask(img.shape, colour=colour, include_polarisation=include_polarisation)
-    green_mask = get_green_mask(img.shape, colour=colour, include_polarisation=include_polarisation)
-    blue_mask = get_blue_mask(img.shape, colour=colour, include_polarisation=include_polarisation)
+    red_mask = get_red_mask(img.shape, colour=colour, include_polarisation=include_polarisation) > 0
+    red = np.reshape(img[red_mask], (img.shape[0] // 2, -1), copy=True)
 
-    red = np.reshape(img[red_mask], (img.shape[0] // 2, -1))
-    green = np.reshape(img[green_mask], (img.shape[0], -1))
+    green_mask = get_green_mask(img.shape, colour=colour, include_polarisation=include_polarisation) > 0
+    green = np.reshape(img[green_mask], (img.shape[0], -1), copy=True)
     green_0 = green[0::2]
     green_1 = green[1::2]
-    blue = np.reshape(img[blue_mask], (img.shape[0] // 2, -1))
+
+    blue_mask = get_blue_mask(img.shape, colour=colour, include_polarisation=include_polarisation) > 0
+    blue = np.reshape(img[blue_mask], (img.shape[0] // 2, -1), copy=True)
 
     return red, green_0, green_1, blue
 
