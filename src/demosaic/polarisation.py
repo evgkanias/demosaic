@@ -63,7 +63,7 @@ def none(img):
 
     new_img = np.zeros((h // 2, w // 2, *img.shape[2:], 4), dtype=img.dtype)
     for i in range(4):
-        new_img[..., i] = img[i % 2::2, i // 2::2]
+        new_img[..., i] = img[i % 2:2*(h//2):2, i // 2:2*(w//2):2]
     return new_img
 
 

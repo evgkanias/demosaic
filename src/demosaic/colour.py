@@ -436,6 +436,10 @@ GROUP_GRAY = {
     GBRG2GRAY_090_045_135_000, GB2GRAY_090_045_135_000, GBRG2GRAY_090_135_045_000, GB2GRAY_090_135_045_000,
     GBRG2GRAY_135_000_090_045, GB2GRAY_135_000_090_045, GBRG2GRAY_135_090_000_045, GB2GRAY_135_090_000_045,
 }
+GROUP_MONO = {
+    MONO_000_045_135_090, MONO_000_135_045_090, MONO_045_000_090_135, MONO_045_090_000_135,
+    MONO_090_045_135_000, MONO_090_135_045_000, MONO_135_000_090_045, MONO_135_090_000_045
+}
 GROUP_000_045_135_090 = {
     BGGR2BGR_000_045_135_090, BG2BGR_000_045_135_090, RGGB2BGR_000_045_135_090, RG2BGR_000_045_135_090,
     GRBG2BGR_000_045_135_090, GR2BGR_000_045_135_090, GBRG2BGR_000_045_135_090, GB2BGR_000_045_135_090,
@@ -564,6 +568,22 @@ def from_gbrg(colour):
     bool
     """
     return colour in GROUP_GBRG
+
+
+def from_mono(colour):
+    """
+    Checks whether the colour code indicates transformation from the monochromatic pattern.
+
+    Parameters
+    ----------
+    colour: int
+        the colour pattern of the mosaic from the colour directory.
+
+    Returns
+    -------
+    bool
+    """
+    return colour in GROUP_MONO
 
 
 def from_000_045_135_090(colour):
